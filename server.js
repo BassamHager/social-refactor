@@ -1,4 +1,9 @@
 const express = require('express');
+const connectDB = require('./config/db')
+
+// connect db
+connectDB()
+
 
 const PORT = process.env.PORT || 5000;
 
