@@ -21,7 +21,7 @@ router.get("/me", auth, async (req, res) => {
     res.json(profile);
   } catch (err) {
     console.log(err.message);
-    return res.status(500).json({ msg: "Server error!" });
+    return res.sendStatus(500).json({ msg: "Server error!" });
   }
 });
 
@@ -38,7 +38,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.sendStatus(400).json({ errors: errors.array() });
     }
 
     const {
@@ -98,7 +98,7 @@ router.post(
       return res.json(profile);
     } catch (err) {
       console.log(err.message);
-      res.status(500).send("Server error!");
+      res.sendStatus(500).send("Server error!");
     }
   }
 );
@@ -112,7 +112,7 @@ router.get("/", async (req, res) => {
     res.json(profiles);
   } catch (err) {
     console.log(err.message);
-    return res.status(500).send("Server error!");
+    return res.sendStatus(500).send("Server error!");
   }
 });
 
@@ -125,14 +125,14 @@ router.get("/user/:userId", async (req, res) => {
       user: req.params.userId,
     }).populate("user", ["name", "avatar"]);
 
-    if (!userProfile) return res.status(404).send("Profile not found!");
+    if (!userProfile) return res.sendStatus(404).send("Profile not found!");
     res.json(userProfile);
   } catch (err) {
     console.log(err.message);
     if (err.kind == "ObjectId") {
-      return res.status(404).send("Profile not found!");
+      return res.sendStatus(404).send("Profile not found!");
     }
-    return res.status(500).send("Server error!");
+    return res.sendStatus(500).send("Server error!");
   }
 });
 
@@ -150,8 +150,63 @@ router.delete("/", auth, async (req, res) => {
     res.json({ msg: "user deleted!" });
   } catch (err) {
     console.log(err.message);
-    return res.status(500).send("Server error!");
+    return res.sendStatus(500).send("Server error!");
   }
 });
+
+// @route   PUT api/profile/experience
+// @desc    Add profile experience
+// @access  Private
+// @requires More restrictions to prevent unnecessary duplications
+router.put(
+  "/experience",
+  [
+    auth,
+    check("title", "Title is required!").not().isEmpty(),
+    check("company", "Company is required!").not().isEmpty(),
+    check("from", "From data is required!").not().isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.sendStatus(400).json({ errors: errors.array() });
+    }
+
+    const {
+      company,
+      title,
+      from,
+      to,
+      current,
+      location,
+      description,
+    } = req.body;
+
+    // try shortcut
+    const newExp = {
+      company,
+      title,
+      from,
+      to,
+      current,
+      location,
+      description,
+    };
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      if (!profile) {
+        return res.sendStatus(404).json({ msg: "Profile not found" });
+      }
+
+      profile.experience.unshift(newExp);
+      await profile.save();
+      return res.json(profile);
+    } catch (err) {
+      console.log(err.message);
+      return res.sendStatus(500).send("Server error!");
+    }
+  }
+);
 
 module.exports = router;
