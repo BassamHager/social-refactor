@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../../middleware/auth");
-const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const Post = require("../../models/Post");
 const { check, validationResult } = require("express-validator");
-const request = require("request");
-const config = require("config");
 
 // @route   POST api/posts
 // @desc    Add a post
@@ -36,7 +33,7 @@ router.post(
       return res.json(post);
     } catch (err) {
       console.log(err.message);
-      return res.sendStatus(500).json("Server error!");
+      return res.sendStatus(500).send("Server error!");
     }
   }
 );
@@ -50,7 +47,7 @@ router.get("/", auth, async (req, res) => {
     res.json(posts);
   } catch (err) {
     console.log(err.message);
-    return res.sendStatus(500).json("Server error!");
+    return res.sendStatus(500).send("Server error!");
   }
 });
 
@@ -70,7 +67,7 @@ router.get("/:postId", auth, async (req, res) => {
     if (err.kind == "ObjectId") {
       return res.sendStatus(404).json({ msg: "Post not found!" });
     }
-    return res.sendStatus(500).json("Server error!");
+    return res.sendStatus(500).send("Server error!");
   }
 });
 
@@ -97,7 +94,70 @@ router.delete("/:postId", auth, async (req, res) => {
     if (err.kind == "ObjectId") {
       return res.sendStatus(404).json({ msg: "Post not found!" });
     }
-    return res.sendStatus(500).json("Server error!");
+    return res.sendStatus(500).send("Server error!");
+  }
+});
+
+// @route   PUT api/posts/like/:postId
+// @desc    Like a post by id
+// @access  Private
+router.put("/like/:postId", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      return res.sendStatus(404).json({ msg: "Post not found!" });
+    }
+
+    // check if post has been liked already
+    const likeCount = post.likes.filter(
+      (like) => like.user.toString() === req.user.id
+    ).length;
+
+    if (likeCount > 0) {
+      return res.status(400).json({ msg: "Post already liked!" });
+    }
+
+    post.likes.unshift({ user: req.user.id });
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500).send("Server error!");
+  }
+});
+
+// @route   PUT api/posts/unlike/:postId
+// @desc    Unlike a post by id
+// @access  Private
+router.put("/unlike/:postId", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      return res.sendStatus(404).json({ msg: "Post not found!" });
+    }
+
+    // check if post has been liked already
+    const likeCount = post.likes.filter(
+      (like) => like.user.toString() === req.user.id
+    ).length;
+
+    if (likeCount === 0) {
+      return res.status(400).json({ msg: "Post not yet liked!" });
+    }
+
+    post.likes = post.likes.filter(
+      (like) => like.user.toString() !== req.user.id
+    );
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.log(err.message);
+    res.sendStatus(500).send("Server error!");
   }
 });
 

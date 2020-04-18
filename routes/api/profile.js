@@ -81,7 +81,6 @@ router.post(
 
     try {
       let profile = await Profile.findOne({ user: req.user.id });
-      console.log(profile);
       if (profile) {
         //update
         profile = await Profile.findOneAndUpdate(
@@ -301,7 +300,6 @@ router.get("/github/:username", async (req, res) => {
       method: "GET",
       headers: { "user-agent": "node.js" },
     };
-    console.log(options);
 
     request(options, (error, response, body) => {
       if (error) console.error(error);
