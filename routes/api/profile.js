@@ -209,17 +209,73 @@ router.put(
   }
 );
 
-// @route   DELETE api/profile/experience/:exp_id
-// @desc    Delete profile experience
+// @route   PUT api/profile/education
+// @desc    Add profile education
 // @access  Private
-router.delete("/experience/:expId", auth, async (req, res) => {
+// @requires More restrictions to prevent unnecessary duplications
+router.put(
+  "/education",
+  [
+    auth,
+    check("school", "School is required!").not().isEmpty(),
+    check("degree", "Degree is required!").not().isEmpty(),
+    check("fieldofstudy", "Field of study is required!").not().isEmpty(),
+    check("from", "From data is required!").not().isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.sendStatus(400).json({ errors: errors.array() });
+    }
+
+    const {
+      school,
+      degree,
+      fieldofstudy,
+      from,
+      to,
+      current,
+      description,
+    } = req.body;
+
+    // try shortcut
+    const newEdu = {
+      school,
+      degree,
+      fieldofstudy,
+      from,
+      to,
+      current,
+      description,
+    };
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      if (!profile) {
+        return res.sendStatus(404).json({ msg: "Profile not found" });
+      }
+
+      profile.education.unshift(newEdu);
+      await profile.save();
+      return res.json(profile.education);
+    } catch (err) {
+      console.log(err.message);
+      return res.sendStatus(500).send("Server error!");
+    }
+  }
+);
+
+// @route   DELETE api/profile/education/:eduId
+// @desc    Delete profile education
+// @access  Private
+router.delete("/education/:eduId", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
     if (!profile) {
       return res.sendStatus(404).json({ msg: "Profile not found!" });
     }
-    profile.experience = profile.experience.filter(
-      (item) => item.id !== req.params.expId
+    profile.education = profile.education.filter(
+      (item) => item.id !== req.params.eduId
     );
     await profile.save();
     return res.json(profile);
