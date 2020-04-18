@@ -161,4 +161,70 @@ router.put("/unlike/:postId", auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+// @route   PUT api/posts/comment/:postId
+// @desc    Add a comment to a specific post
+// @access  Private
+router.put(
+  "/comment/:postId",
+  [auth, [check("text", "Text is required!").not().isEmpty()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.sendStatus(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const user = await User.findById(req.user.id);
+      const post = await Post.findById(req.params.postId);
+      if (!user) {
+        return res.sendStatus(404).json({ msg: "User not found!" });
+      }
+      if (!post) {
+        return res.sendStatus(404).json({ msg: "Post not found!" });
+      }
+
+      const newComment = {
+        text: req.body.text,
+        user: req.user.id,
+        avatar: user.avatar,
+        name: user.name,
+      };
+
+      post.comments.unshift(newComment);
+      await post.save();
+
+      res.json(post.comments);
+    } catch (err) {
+      console.log(err.message);
+      return res.sendStatus(500).send("Server error!");
+    }
+  }
+);
+
+// @route   DELETE api/posts/comment/:postId/:commentId
+// @desc    Delete a comment by postId & commentId
+// @access  Private
+router.delete("/comment/:postId/:commentId", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return res.sendStatus(404).json({ msg: "Post not found!" });
+    }
+
+    post.comments = post.comments.filter(
+      (comment) => comment.id !== req.params.commentId
+    );
+
+    if (comment.user.toString() !== req.user.id) {
+      return res.sendStatus(401).json({ msg: "User not authorized!" });
+    }
+
+    await post.save();
+    res.json(post.comments);
+  } catch (err) {
+    console.log(err.message);
+    return res.sendStatus(400).send("Server error!");
+  }
+});
+
+module.exports = router; // always authorize only the user to like, add a comment and to delete.
