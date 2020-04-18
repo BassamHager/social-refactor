@@ -1,4 +1,6 @@
 {
-    "mongoURI": "mongodb+srv://biso123:biso123@social-refactor-cluster-prg5q.mongodb.net/test?retryWrites=true&w=majority",
-    "jwtSecret": "jwtSecretToken"
+  "mongoURI": "mongodb+srv://biso123:biso123@social-refactor-cluster-prg5q.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "jwtSecretToken",
+  "githubClientId": "97f1f4dafe50df077d9e",
+  "githubSecret": "6b6fc0833656476a262c354bad5dc43a2fa575c0"
 }
