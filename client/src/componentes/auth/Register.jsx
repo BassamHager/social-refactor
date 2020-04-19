@@ -1,6 +1,9 @@
 import React, { Fragment, useState } from "react";
+import { Link } from "react-router-dom";
 
-export default function Register() {
+// import axios from "axios";
+
+const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,12 +17,28 @@ export default function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (password !== password2) {
       console.log("wrong matching!");
     } else {
-      console.log(formData);
+      console.log("Successfully");
+      //   const newUser = { name, email, password };
+      //   try {
+      //     const config = {
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //       },
+      //     };
+      //     const res = await axios.post(
+      //       "/api/users",
+      //       JSON.stringify(newUser),
+      //       config
+      //     );
+      //     console.log(res.data);
+      //   } catch (err) {
+      //     console.error(err.response.data);
+      //   }
     }
   };
 
@@ -78,8 +97,10 @@ export default function Register() {
         <input type="submit" className="btn btn-primary" value="Register" />
       </form>
       <p className="my-1">
-        Already have an account? <a href="login.html">Sign In</a>
+        Already have an account? <Link to="/login">Log In</Link>
       </p>
     </Fragment>
   );
-}
+};
+
+export default Register;
