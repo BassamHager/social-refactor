@@ -6,7 +6,7 @@ export default function Navbar() {
     <nav className="navbar bg-dark">
       <h1>
         <Link to="/">
-          <i className="fas fa-code"></i> DevConnector
+          <i className="fas fa-code"></i> Social_Dev_Connector
         </Link>
       </h1>
       <ul>
@@ -14,10 +14,8 @@ export default function Navbar() {
           <Link to="/">Developers</Link>
         </li>
         <li>
-          <Link to="register">Register</Link>
-        </li>
-        <li>
-          <Link to="login">Login</Link>
+          {/* {!isLoginMode ? "In" : "Out"} */}
+          <Link to="/auth">Sign </Link>
         </li>
       </ul>
     </nav>
