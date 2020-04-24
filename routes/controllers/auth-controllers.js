@@ -3,25 +3,31 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const jwtSecret = config.get("jwtSecret");
-const {
-  serverError,
-  validationError,
-  badRequestReturn,
-} = require("../../errors");
+const { validationResult } = require("express-validator");
+const HttpError = require("../../util/error-model");
 
 // 1- Get authenticated user
-const getAuthUser = async (req, res) => {
+const getAuthUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    const error = new HttpError("Server error!", 500);
+    return next(error);
   }
 };
 
 // 2- Authenticate user & get token
 const getUserToken = async (req, res) => {
-  validationError(req, res);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new HttpError(
+      "Invalid inputs passed, please check your data.",
+      422
+    );
+    return next(error);
+  }
 
   const { email, password } = req.body;
 
@@ -30,14 +36,16 @@ const getUserToken = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      badRequestReturn("Invalid credentials!");
+      const error = new HttpError("Invalid credentials!", 400);
+      return next(error);
     }
 
     //   check if the credentials match
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      badRequestReturn(res, "Invalid credentials!");
+      const error = new HttpError("Invalid credentials!", 400);
+      return next(error);
     }
 
     // return jwt
@@ -52,7 +60,9 @@ const getUserToken = async (req, res) => {
       return res.json({ token });
     });
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    const error = new HttpError("Server error!", 500);
+    return next(error);
   }
 };
 

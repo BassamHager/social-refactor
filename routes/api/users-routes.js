@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../../middleware/auth");
 const { check } = require("express-validator");
-const { registerUser } = require("../controllers/users-controllers");
+const {
+  registerUser,
+  deleteUser,
+} = require("../controllers/users-controllers");
 
 // @route   POST api/users
 // @access  Public
@@ -16,5 +20,9 @@ router.post(
   ],
   registerUser
 );
+
+// @route   DELETE api/users/:userId
+// @access  Private
+router.delete("/:userId", auth, deleteUser);
 
 module.exports = router;

@@ -1,8 +1,9 @@
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
+const HttpError = require("../../util/error-model");
+const { validationResult } = require("express-validator");
 const request = require("request");
 const config = require("config");
-const { serverError, validationError, notFoundError } = require("../../errors");
 
 // 1- Get my profile
 const getMyProfile = async (req, res) => {
@@ -17,13 +18,19 @@ const getMyProfile = async (req, res) => {
 
     res.json(profile);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
 // 2- Create or update a user profile
 const createOrUpdateProfile = async (req, res) => {
-  validationError();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
   const {
     company,
@@ -80,7 +87,8 @@ const createOrUpdateProfile = async (req, res) => {
     await profile.save();
     return res.json(profile);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -91,7 +99,8 @@ const getAllProfiles = async (req, res) => {
 
     res.json(profiles);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -102,11 +111,16 @@ const getUserProfile = async (req, res) => {
       user: req.params.userId,
     }).populate("user", ["name", "avatar"]);
 
-    if (!userProfile) notFoundError(res, "profile");
+    if (!userProfile) {
+      return new HttpError("Profile not found!", 404);
+    }
     res.json(userProfile);
   } catch (err) {
-    if (err.kind == "ObjectId") notFoundError(res, "profile");
-    serverError(res, err);
+    if (err.kind == "ObjectId") {
+      return new HttpError("Profile not found!", 404);
+    }
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -122,14 +136,20 @@ const deleteProfile = async (req, res) => {
     await User.findOneAndDelete({ _id: req.user.id });
     res.json({ msg: "user deleted!" });
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
 // 6- Add profile experience
 // @requires More restrictions to prevent unnecessary duplications
 const addExp = async (req, res) => {
-  validationError(req, res);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
   const { company, title, from, to, current, location, description } = req.body;
 
@@ -146,20 +166,28 @@ const addExp = async (req, res) => {
 
   try {
     const profile = await Profile.findOne({ user: req.user.id });
-    if (!profile) notFoundError(res, "profile");
+    if (!profile) {
+      return new HttpError("Profile not found!", 404);
+    }
 
     profile.experience.unshift(newExp);
     await profile.save();
     return res.json(profile);
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
 // 7- Add profile education
 // @requires More restrictions to prevent unnecessary duplications
 const addEdu = async (req, res) => {
-  validationError(req, res);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
   const {
     school,
@@ -184,13 +212,16 @@ const addEdu = async (req, res) => {
 
   try {
     const profile = await Profile.findOne({ user: req.user.id });
-    if (!profile) notFoundError(res, "profile");
+    if (!profile) {
+      return new HttpError("Profile not found!", 404);
+    }
 
     profile.education.unshift(newEdu);
     await profile.save();
     return res.json(profile.education);
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -198,14 +229,19 @@ const addEdu = async (req, res) => {
 const deleteEdu = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
-    if (!profile) notFoundError(res, "profile");
+
+    if (!profile) {
+      return new HttpError("Profile not found!", 404);
+    }
+
     profile.education = profile.education.filter(
       (item) => item.id !== req.params.eduId
     );
     await profile.save();
     return res.json(profile);
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -225,12 +261,15 @@ const getGithubRepos = async (req, res) => {
     request(options, (error, response, body) => {
       if (error) console.error(error);
 
-      if (response.statusCode !== 200) notFoundError(res, "Github profile");
+      if (response.statusCode !== 200) {
+        return new HttpError("No Github repos found!", 404);
+      }
 
       res.json(JSON.parse(body));
     });
   } catch (err) {
-    serverError(err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 

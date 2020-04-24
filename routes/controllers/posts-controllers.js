@@ -1,16 +1,16 @@
 const User = require("../../models/User");
 const Post = require("../../models/Post");
-const {
-  serverError,
-  validationError,
-  notAuthorizedError,
-  badRequestReturn,
-  notFoundError,
-} = require("../../errors");
+const HttpError = require("../../util/error-model");
+const { validationResult } = require("express-validator");
 
 // 1- Add a post
 const addPost = async (req, res) => {
-  validationError();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
   try {
     const user = await (await User.findById(req.user.id)).isSelected(
@@ -27,7 +27,8 @@ const addPost = async (req, res) => {
     const post = await newPost.save();
     return res.json(post);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -37,7 +38,8 @@ const getAllPosts = async (req, res) => {
     const posts = await Post.find().sort({ date: -1 });
     res.json(posts);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -46,12 +48,16 @@ const getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
 
-    if (!post) notFoundError(err, "post");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
     res.json(post);
   } catch (err) {
+    if (err.kind == "ObjectId") {
+      return new HttpError("Post not found!", 404);
+    }
     console.log(err.message);
-    if (err.kind == "ObjectId") notFoundError(err, "post");
-    serverError(res, err);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -60,16 +66,23 @@ const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
 
-    if (!post) notFoundError(err, "post");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
 
-    if (post.user.toString() !== req.user.id) notAuthorizedError(res);
+    if (post.user.toString() !== req.user.id) {
+      return new HttpError("User not authorized!", 403);
+    }
 
     await post.remove();
 
     res.json({ msg: "post deleted!" });
   } catch (err) {
-    if (err.kind == "ObjectId") notFoundError(err, "post");
-    serverError(res, err);
+    if (err.kind == "ObjectId") {
+      return new HttpError("Post not found!", 404);
+    }
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -78,21 +91,26 @@ const likePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
 
-    if (!post) notFoundError(err, "post");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
 
     // check if post has been liked already
     const likeCount = post.likes.filter(
       (like) => like.user.toString() === req.user.id
     ).length;
 
-    if (likeCount > 0) badRequestReturn(res, "Post already liked!");
+    if (likeCount > 0) {
+      return new HttpError("Post already liked!", 400);
+    }
 
     post.likes.unshift({ user: req.user.id });
     await post.save();
 
     res.json(post.likes);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -101,14 +119,18 @@ const unlikePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
 
-    if (!post) notFoundError(err, "post");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
 
     // check if post has been liked already
     const likeCount = post.likes.filter(
       (like) => like.user.toString() === req.user.id
     ).length;
 
-    if (likeCount === 0) badRequestReturn(res, "Post not yet liked!");
+    if (likeCount === 0) {
+      return new HttpError("Post not yet liked!", 400);
+    }
 
     post.likes = post.likes.filter(
       (like) => like.user.toString() !== req.user.id
@@ -118,21 +140,31 @@ const unlikePost = async (req, res) => {
 
     res.json(post.likes);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
 // 7- Add a comment to a specific post
 const addComment = async (req, res) => {
-  validationError();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(
+      new HttpError("Invalid inputs passed, please check your data.", 422)
+    );
+  }
 
   try {
     const user = await User.findById(req.user.id);
     const post = await Post.findById(req.params.postId);
 
-    if (!user) notFoundError(res, "User not found!");
+    if (!user) {
+      return new HttpError("User not found!", 404);
+    }
 
-    if (!post) notFoundError(res, "Post not found!");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
 
     const newComment = {
       text: req.body.text,
@@ -146,7 +178,8 @@ const addComment = async (req, res) => {
 
     res.json(post.comments);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
@@ -154,19 +187,23 @@ const addComment = async (req, res) => {
 const deleteComment = async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
-    if (!post) notFoundError(res, "Post not found!");
+    if (!post) {
+      return new HttpError("Post not found!", 404);
+    }
 
     post.comments = post.comments.filter(
       (comment) => comment.id !== req.params.commentId
     );
 
-    if (comment.user.toString() !== req.user.id)
-      notAuthorizedError(res, "User not authorized!");
+    if (comment.user.toString() !== req.user.id) {
+      return new HttpError("User unauthorized!", 403);
+    }
 
     await post.save();
     res.json(post.comments);
   } catch (err) {
-    serverError(res, err);
+    console.log(err.message);
+    return new HttpError("Server error!", 500);
   }
 };
 
