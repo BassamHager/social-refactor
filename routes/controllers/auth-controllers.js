@@ -9,7 +9,12 @@ const HttpError = require("../../util/error-model");
 // 1- Get authenticated user
 const getAuthUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.userId).select("-password");
+
+    if (!user) {
+      const error = new HttpError("User not found!", 404);
+      return next(error);
+    }
     res.json(user);
   } catch (err) {
     console.log(err.message);
@@ -50,7 +55,7 @@ const getUserToken = async (req, res) => {
 
     // return jwt
     const payload = {
-      user: {
+      userId: {
         id: user.id,
       },
     };

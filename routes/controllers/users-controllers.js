@@ -59,9 +59,7 @@ const registerUser = async (req, res, next) => {
 
     // return jwt
     const payload = {
-      user: {
-        id: user.id,
-      },
+      userId: user.id,
     };
 
     jwt.sign(payload, jwtSecret, { expiresIn: 360000 }, (err, token) => {

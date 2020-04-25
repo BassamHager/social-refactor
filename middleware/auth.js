@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const jwtSecret = require("config").get("jwtSecret");
+const HttpError = require("../util/error-model");
 
 module.exports = async (req, res, next) => {
   // get token from header
@@ -7,16 +8,18 @@ module.exports = async (req, res, next) => {
 
   // check if valid token
   if (!token) {
-    return res.status(401).json({ msg: "No token, authorization denied!" });
+    const error = new HttpError("No token, authorization denied!", 401);
+    return next(error);
   }
 
   // verify token
   try {
     const decoded = await jwt.verify(token, jwtSecret);
 
-    req.user = decoded.user;
+    req.userId = decoded.userId;
     next();
-  } catch (error) {
-    return res.status(401).json({ msg: "Token is not valid!" });
+  } catch (err) {
+    const error = new HttpError("Token is not valid!", 401);
+    return next(error);
   }
 };
