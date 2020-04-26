@@ -1,16 +1,21 @@
-import React, { Fragment, useState } from "react";
-import Input from "../customized/formElement/Input";
+import React, { Fragment, useState, useContext } from "react";
+import Input from "../../customized/formElement/Input";
+import Button from "../../customized/formElement/Button";
+import UseForm from "../../customized/hooks/Form-hook";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
-} from "../util/Validators";
-import UseForm from "../customized/hooks/Form-hook";
-import Button from "../customized/formElement/Button";
+} from "../../util/Validators";
+import { AlertContext } from "../../context/alert-context";
 
 const Auth = () => {
   const [isLoginMode, setIsLoginMode] = useState(false);
 
+  // Alert
+  const { setAlert } = useContext(AlertContext);
+
+  //
   const [formState, inputHandler, setFormData] = UseForm(
     {
       name: {
@@ -69,18 +74,19 @@ const Auth = () => {
     event.preventDefault();
     if (!isLoginMode) {
       if (password.value === password2.value) {
-        console.log(formState);
+        setAlert("success", "You have logged in successfully!");
       } else {
-        console.log("wrong passwords!");
-        console.log(password.value, password2.value);
+        setAlert("danger", "Passwords don't match!");
       }
     } else {
-      console.log(formState);
+      setAlert("danger", "You have logged out!");
     }
   };
 
   return (
     <Fragment>
+      {/* <Alert /> */}
+
       <h1 className="large text-primary">
         {!isLoginMode ? "Sign Up" : "Sign In"}
       </h1>
