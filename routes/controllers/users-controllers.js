@@ -22,7 +22,7 @@ const registerUser = async (req, res, next) => {
 
   let existingUser;
   try {
-    existingUser = await User.findOne({ email: email });
+    existingUser = await User.findOne({ email });
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
@@ -39,32 +39,47 @@ const registerUser = async (req, res, next) => {
     return next(error);
   }
 
+  let avatar, hashedPassword;
   try {
-    // get user gravatar
-    const avatar = gravatar.url(email, { s: "200", r: "pg", d: "mm" });
+    avatar = gravatar.url(email, { s: "200", r: "pg", d: "mm" });
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not create user, please try again.",
+      500
+    );
+    return next(error);
+  }
 
-    user = new User({
-      name,
-      email,
-      password,
-      avatar,
-    });
+  const newUser = new User({
+    name,
+    email,
+    password: hashedPassword,
+    avatar,
+  });
 
-    // hash the password
-    const salt = await bcrypt.genSalt(10);
+  try {
+    await newUser.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
 
-    user.password = await bcrypt.hash(password, salt);
+  const payload = {
+    userId: newUser.id,
+  };
 
-    await user.save();
-
-    // return jwt
-    const payload = {
-      userId: user.id,
-    };
-
+  try {
     jwt.sign(payload, jwtSecret, { expiresIn: 360000 }, (err, token) => {
       if (err) throw err;
-      return res.json({ token });
+      return res.status(201).json({
+        userId: newUser.id,
+        email: newUser.email,
+        token,
+      });
     });
   } catch (err) {
     console.log(err.message);
@@ -73,7 +88,71 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-// 2- delete a user by id
+// 2- Login a user
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email });
+  } catch (err) {
+    const error = new HttpError(
+      "Logging in failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!existingUser) {
+    const error = new HttpError(
+      "Invalid credentials, could not log you in.",
+      403
+    );
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not log you in, please check your credentials and try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      "Invalid credentials, could not log you in.",
+      403
+    );
+    return next(error);
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      jwtSecret,
+      { expiresIn: "1h" }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Logging in failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  res.json({
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token,
+  });
+};
+
+// 3- Delete a user by id
 const deleteUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -104,4 +183,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, deleteUser };
+module.exports = { registerUser, login, deleteUser };

@@ -1,22 +1,22 @@
 import React, { Fragment, useState, useContext } from "react";
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
-import UseForm from "../../customized/hooks/Form-hook";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
 } from "../../util/Validators";
 import { AlertContext } from "../../context/alert-context";
+import { useForm } from "../../customized/hooks/Form-hook";
+import { useHttpClient } from "../../customized/hooks/Http-hook";
+import { AuthContext } from "../../context/auth-context";
 
 const Auth = () => {
-  const [isLoginMode, setIsLoginMode] = useState(false);
-
-  // Alert
   const { setAlert } = useContext(AlertContext);
-
-  //
-  const [formState, inputHandler, setFormData] = UseForm(
+  const [isLoginMode, setIsLoginMode] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const auth = useContext(AuthContext);
+  const [formState, inputHandler, setFormData] = useForm(
     {
       name: {
         value: "",
@@ -40,7 +40,7 @@ const Auth = () => {
 
   const { email, password, password2 } = formState.inputs;
 
-  //  Switch Mode Handler
+  //  SWITCH LOGGING MODE
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
@@ -70,23 +70,57 @@ const Auth = () => {
     setIsLoginMode((prevMode) => !prevMode);
   };
 
+  // SUBMIT FORM
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    if (!isLoginMode) {
-      if (password.value === password2.value) {
-        setAlert("success", "You have logged in successfully!");
-      } else {
-        setAlert("danger", "Passwords don't match!");
-      }
+
+    //
+    if (isLoginMode) {
+      try {
+        const responseData = await sendRequest(
+          "/api/users/login",
+          "POST",
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          }
+        );
+        auth.login(responseData.userId, responseData.token);
+      } catch (err) {}
     } else {
-      setAlert("danger", "You have logged out!");
+      try {
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/users/signup",
+          "POST",
+          formData
+        );
+
+        auth.login(responseData.userId, responseData.token);
+      } catch (err) {}
     }
+    //
+
+    // if (isLoginMode) {
+    //   if (password.value === password2.value) {
+    //     setAlert("success", "You have logged in successfully!");
+    //   } else {
+    //     setAlert("danger", "Passwords don't match!");
+    //   }
+    // } else {
+    //   setAlert("danger", "You have logged out!");
+    // }
   };
 
   return (
     <Fragment>
-      {/* <Alert /> */}
-
       <h1 className="large text-primary">
         {!isLoginMode ? "Sign Up" : "Sign In"}
       </h1>
