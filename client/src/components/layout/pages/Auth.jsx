@@ -13,7 +13,7 @@ import { AuthContext } from "../../context/auth-context";
 
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);
-  const [isLoginMode, setIsLoginMode] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const [formState, inputHandler, setFormData] = useForm(
@@ -38,7 +38,7 @@ const Auth = () => {
     false
   );
 
-  const { email, password, password2 } = formState.inputs;
+  const { name, email, password, password2 } = formState.inputs;
 
   //  SWITCH LOGGING MODE
   const switchModeHandler = () => {
@@ -74,49 +74,47 @@ const Auth = () => {
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    //
     if (isLoginMode) {
       try {
-        const responseData = await sendRequest(
+        const resData = await sendRequest(
           "/api/users/login",
           "POST",
           JSON.stringify({
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
+            email: email.value,
+            password: password.value,
           }),
           {
             "Content-Type": "application/json",
           }
         );
-        auth.login(responseData.userId, responseData.token);
-      } catch (err) {}
+        auth.login(resData.userId, resData.token);
+        setAlert("success", "You have logged in successfully!");
+      } catch (err) {
+        setAlert("danger", err.message);
+      }
     } else {
       try {
-        const formData = new FormData();
-        formData.append("email", formState.inputs.email.value);
-        formData.append("name", formState.inputs.name.value);
-        formData.append("password", formState.inputs.password.value);
-        formData.append("image", formState.inputs.image.value);
-        const responseData = await sendRequest(
-          "http://localhost:5000/api/users/signup",
+        const resData = await sendRequest(
+          "/api/users/signup",
           "POST",
-          formData
+          JSON.stringify({
+            name: name.value,
+            email: email.value,
+            password: password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          }
         );
 
-        auth.login(responseData.userId, responseData.token);
-      } catch (err) {}
+        if (resData) {
+          auth.login(resData.userId, resData.token);
+          setAlert("success", "You have signed up successfully!");
+        }
+      } catch (err) {
+        setAlert("danger", err.message);
+      }
     }
-    //
-
-    // if (isLoginMode) {
-    //   if (password.value === password2.value) {
-    //     setAlert("success", "You have logged in successfully!");
-    //   } else {
-    //     setAlert("danger", "Passwords don't match!");
-    //   }
-    // } else {
-    //   setAlert("danger", "You have logged out!");
-    // }
   };
 
   return (

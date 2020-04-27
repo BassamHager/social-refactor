@@ -27,7 +27,7 @@ export const useHttpClient = () => {
         );
 
         if (!response.ok) {
-          throw new Error(responseData.message);
+          throw Error(responseData.message);
         }
 
         setIsLoading(false);
@@ -35,8 +35,7 @@ export const useHttpClient = () => {
       } catch (err) {
         setError(err.message);
         setIsLoading(false);
-        // throw err;
-        console.log(err);
+        throw Error(err.message);
       }
     },
     []
