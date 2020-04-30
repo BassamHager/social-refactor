@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useContext } from "react";
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
+import Alert from "../Alert";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
@@ -88,6 +89,7 @@ const Auth = () => {
           }
         );
         auth.login(resData.userId, resData.token);
+
         setAlert("success", "You have logged in successfully!");
       } catch (err) {
         setAlert("danger", err.message);
@@ -119,6 +121,7 @@ const Auth = () => {
 
   return (
     <Fragment>
+      <Alert />
       <h1 className="large text-primary">
         {!isLoginMode ? "Sign Up" : "Sign In"}
       </h1>

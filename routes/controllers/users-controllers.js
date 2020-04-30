@@ -104,10 +104,7 @@ const login = async (req, res, next) => {
   }
 
   if (!existingUser) {
-    const error = new HttpError(
-      "Invalid credentials, could not log you in.",
-      403
-    );
+    const error = new HttpError("User is not registered!, please sign up", 404);
     return next(error);
   }
 

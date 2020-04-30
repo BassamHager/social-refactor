@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/auth-context";
+import { useAuth } from "../customized/hooks/Auth-hook";
+import Button from "../customized/formElement/Button";
 
 export default function Navbar() {
+  const auth = useContext(AuthContext);
+  const { token } = useAuth();
+
+  const handleLoggin = () => {
+    if (token) {
+      auth.logout();
+    } else {
+      auth.login();
+    }
+  };
+
   return (
     <nav className="navbar bg-dark">
       <h1>
@@ -14,8 +28,12 @@ export default function Navbar() {
           <Link to="/">Developers</Link>
         </li>
         <li>
-          {/* {!isLoginMode ? "In" : "Out"} */}
-          <Link to="/auth">Sign </Link>
+          <Link to="/auth">Register</Link>
+        </li>
+        <li>
+          <Button onClick={handleLoggin}>
+            Log {auth.token ? "Out" : "In"}
+          </Button>
         </li>
       </ul>
     </nav>
