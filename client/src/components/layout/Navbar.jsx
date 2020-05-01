@@ -1,19 +1,17 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
-import { useAuth } from "../customized/hooks/Auth-hook";
-import Button from "../customized/formElement/Button";
 
 export default function Navbar() {
-  const auth = useContext(AuthContext);
-  const { token } = useAuth();
+  const { token, setIsToLoginMode, logout, login } = useContext(AuthContext);
 
-  const handleLoggin = () => {
+  const handleLogging = () => {
     if (token) {
-      auth.logout();
+      logout();
     } else {
-      auth.login();
+      login();
     }
+    setIsToLoginMode(true);
   };
 
   return (
@@ -28,12 +26,18 @@ export default function Navbar() {
           <Link to="/">Developers</Link>
         </li>
         <li>
-          <Link to="/auth">Register</Link>
+          <Link to="/auth" onClick={() => setIsToLoginMode(false)}>
+            Register
+          </Link>
         </li>
         <li>
-          <Button onClick={handleLoggin}>
-            Log {auth.token ? "Out" : "In"}
-          </Button>
+          <Link
+            to="/auth"
+            onClick={handleLogging}
+            className={token ? "red" : "greed"}
+          >
+            Log {token ? "Out" : "In"}
+          </Link>
         </li>
       </ul>
     </nav>

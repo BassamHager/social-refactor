@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { Fragment, useContext } from "react";
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
 import Alert from "../Alert";
@@ -14,9 +14,9 @@ import { AuthContext } from "../../context/auth-context";
 
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const auth = useContext(AuthContext);
+  const { sendRequest } = useHttpClient();
+  const { login, isToLoginMode, setIsToLoginMode } = useContext(AuthContext);
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       name: {
@@ -31,19 +31,21 @@ const Auth = () => {
         value: "",
         isValid: false,
       },
-      password2: {
-        value: "",
-        isValid: false,
-      },
+      // password2: {
+      //   value: "",
+      //   isValid: false,
+      // },
     },
     false
   );
 
-  const { name, email, password, password2 } = formState.inputs;
+  // add password2
+  const { name, email, password } = formState.inputs;
 
   //  SWITCH LOGGING MODE
   const switchModeHandler = () => {
-    if (!isLoginMode) {
+    if (!isToLoginMode) {
+      //if it's still in registration mode
       setFormData(
         {
           ...formState.inputs,
@@ -68,14 +70,14 @@ const Auth = () => {
         false
       );
     }
-    setIsLoginMode((prevMode) => !prevMode);
+    setIsToLoginMode((isToLoginMode) => !isToLoginMode);
   };
 
   // SUBMIT FORM
   const authSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (isLoginMode) {
+    if (isToLoginMode) {
       try {
         const resData = await sendRequest(
           "/api/users/login",
@@ -88,7 +90,7 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        auth.login(resData.userId, resData.token);
+        login(resData.userId, resData.token);
 
         setAlert("success", "You have logged in successfully!");
       } catch (err) {
@@ -110,7 +112,7 @@ const Auth = () => {
         );
 
         if (resData) {
-          auth.login(resData.userId, resData.token);
+          login(resData.userId, resData.token);
           setAlert("success", "You have signed up successfully!");
         }
       } catch (err) {
@@ -123,12 +125,14 @@ const Auth = () => {
     <Fragment>
       <Alert />
       <h1 className="large text-primary">
-        {!isLoginMode ? "Sign Up" : "Sign In"}
+        {!isToLoginMode ? "Sign Up" : "Sign In"}
       </h1>
 
-      <p className="lead">{isLoginMode ? "Sign In " : "Create "}Your Account</p>
+      <p className="lead">
+        {isToLoginMode ? "Sign In " : "Create "}Your Account
+      </p>
       <form className="form" onSubmit={authSubmitHandler}>
-        {!isLoginMode && (
+        {!isToLoginMode && (
           <div className="form-group">
             <Input
               element="input"
@@ -169,7 +173,7 @@ const Auth = () => {
           />
         </div>
 
-        {!isLoginMode && (
+        {/* {!isToLoginMode && (
           <div className="form-group">
             <Input
               element="input"
@@ -182,15 +186,15 @@ const Auth = () => {
               onInput={inputHandler}
             />
           </div>
-        )}
+        )} */}
 
         <Button type="submit" disabled={!formState.isValid}>
-          {isLoginMode ? "LOGIN" : "SIGN UP"}
+          {isToLoginMode ? "LOGIN" : "SIGN UP"}
         </Button>
       </form>
       <br />
       <Button className="my-1" inverse onClick={switchModeHandler}>
-        SWITCH TO {isLoginMode ? "SIGN UP" : "LOGIN"}
+        SWITCH TO {isToLoginMode ? "SIGN UP" : "LOGIN"}
       </Button>
     </Fragment>
   );

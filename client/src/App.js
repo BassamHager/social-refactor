@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/layout/Navbar";
@@ -14,6 +14,7 @@ import Dashboard from "./components/layout/pages/Dashboard";
 const App = () => {
   const { token, login, logout, userId } = useAuth();
   const [alerts, setAlert] = useAlert();
+  const [isToLoginMode, setIsToLoginMode] = useState(true);
 
   return (
     <Router>
@@ -24,6 +25,8 @@ const App = () => {
           userId: userId,
           login: login,
           logout: logout,
+          isToLoginMode,
+          setIsToLoginMode,
         }}
       >
         <AlertContext.Provider value={{ alerts, setAlert }}>
@@ -32,6 +35,8 @@ const App = () => {
           <section className="container">
             <Switch>
               <Route exact path="/auth" component={Auth} />
+              {/* login is an optional route */}
+              <Route exact path="/login" component={Auth} />
               <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/profile" component={Profile} />
             </Switch>

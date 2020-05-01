@@ -493,6 +493,14 @@ button {
   margin-bottom: 0.5rem;
 }
 
+.red {
+  background: rgba(212, 6, 184, 0.411);
+}
+
+.green {
+  background: green;
+}
+
 /* Mobile Styles */
 @media (max-width: 700px) {
   .container {
