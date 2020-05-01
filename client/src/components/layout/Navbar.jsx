@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
 
-export default function Navbar() {
+const Navbar = () => {
   const { token, setIsToLoginMode, logout, login } = useContext(AuthContext);
 
   const handleLogging = () => {
@@ -42,4 +42,6 @@ export default function Navbar() {
       </ul>
     </nav>
   );
-}
+};
+
+export default Navbar;

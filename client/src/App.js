@@ -35,8 +35,6 @@ const App = () => {
           <section className="container">
             <Switch>
               <Route exact path="/auth" component={Auth} />
-              {/* login is an optional route */}
-              <Route exact path="/login" component={Auth} />
               <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/profile" component={Profile} />
             </Switch>

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/auth-context";
 
-export default function Landing() {
+const Landing = () => {
+  const { setIsToLoginMode } = useContext(AuthContext);
+
   return (
     <section className="landing">
       <div className="dark-overlay">
@@ -12,12 +15,25 @@ export default function Landing() {
             other developers
           </p>
           <div className="buttons">
-            <Link to="/auth" className="btn btn-primary">
-              Sign Up / Login
+            <Link
+              to="/auth"
+              onClick={() => setIsToLoginMode(false)}
+              className="btn btn-primary"
+            >
+              Sign Up
+            </Link>
+            <Link
+              to="/auth"
+              onClick={() => setIsToLoginMode(true)}
+              className="btn btn-primary"
+            >
+              Login
             </Link>
           </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default Landing;
