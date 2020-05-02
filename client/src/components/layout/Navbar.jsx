@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
 import Alert from "../layout/Alert";
 import { AlertContext } from "../context/alert-context";
+import Dashboard from "./pages/Dashboard";
 
 const Navbar = () => {
   const { setAlert } = useContext(AlertContext);
-  const { token, setIsToLoginMode, logout, login } = useContext(AuthContext);
+  const { token, setIsToLoginMode, logout, login, isToLoginMode } = useContext(
+    AuthContext
+  );
 
   const handleLogging = () => {
     if (token) {
@@ -30,12 +33,23 @@ const Navbar = () => {
           <li>
             <Link to="/">Developers</Link>
           </li>
-
-          <li>
-            <Link to="/auth" onClick={() => setIsToLoginMode(false)}>
-              Register
-            </Link>
-          </li>
+          {!token && (
+            <li>
+              <Link to="/auth" onClick={() => setIsToLoginMode(false)}>
+                Register
+              </Link>
+            </li>
+          )}
+          {token && (
+            <li>
+              <Link to="/dashboard">Dashboard</Link>
+            </li>
+          )}
+          {token && (
+            <li>
+              <Link to="/profile">Profile</Link>
+            </li>
+          )}
           <li>
             <Link
               to="/auth"
@@ -48,6 +62,7 @@ const Navbar = () => {
         </ul>
       </nav>
       <Alert />
+      {!token && <Alert />}
     </Fragment>
   );
 };
