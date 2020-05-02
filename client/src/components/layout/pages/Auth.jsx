@@ -1,7 +1,6 @@
 import React, { Fragment, useContext } from "react";
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
-import Alert from "../Alert";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
@@ -11,12 +10,13 @@ import { AlertContext } from "../../context/alert-context";
 import { useForm } from "../../customized/hooks/Form-hook";
 import { useHttpClient } from "../../customized/hooks/Http-hook";
 import { AuthContext } from "../../context/auth-context";
+import { useHistory } from "react-router-dom";
 
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);
   const { sendRequest } = useHttpClient();
   const { login, isToLoginMode, setIsToLoginMode } = useContext(AuthContext);
-
+  const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
       name: {
@@ -91,8 +91,8 @@ const Auth = () => {
           }
         );
         login(resData.userId, resData.token);
-
         setAlert("success", "You have logged in successfully!");
+        history.push("/dashboard");
       } catch (err) {
         setAlert("danger", err.message);
       }
@@ -123,7 +123,6 @@ const Auth = () => {
 
   return (
     <Fragment>
-      <Alert />
       <h1 className="large text-primary">
         {!isToLoginMode ? "Sign Up" : "Sign In"}
       </h1>
