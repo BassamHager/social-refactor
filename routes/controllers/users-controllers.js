@@ -141,8 +141,7 @@ const login = async (req, res, next) => {
     );
     return next(error);
   }
-
-  res.json({ userId: req.userId, token });
+  res.json({ userId: existingUser.id, token });
 };
 
 // 3- Delete a user by id

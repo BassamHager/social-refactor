@@ -38,7 +38,7 @@ const Navbar = () => {
             </li>
           )}
           {token && (
-            <li>
+            <li className="fas fa-user">
               <Link to="/dashboard">Dashboard</Link>
             </li>
           )}

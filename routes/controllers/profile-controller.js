@@ -12,8 +12,9 @@ const getMyProfile = async (req, res) => {
       user: req.user.id,
     }).populate("user", ["name", "avatar"]);
 
+    console.log(user);
     if (!profile) {
-      notFoundError(res, "profile");
+      return new HttpError("profile not found!", 404);
     }
 
     res.json(profile);
@@ -49,7 +50,7 @@ const createOrUpdateProfile = async (req, res) => {
 
   // build profile object
   const profileFields = {};
-  profileFields.user = req.user.id;
+  profileFields.user = req.userId;
   if (company) profileFields.company = company;
   if (website) profileFields.website = website;
   if (location) profileFields.location = location;
@@ -69,8 +70,9 @@ const createOrUpdateProfile = async (req, res) => {
   if (instagram) profileFields.social.instagram = instagram;
 
   try {
-    let profile = await Profile.findOne({ user: req.user.id });
+    let profile = await Profile.findOne({ user: req.userId });
     if (profile) {
+      console.log("123: createOrUpdateProfile -> profile", profile);
       //update
       profile = await Profile.findOneAndUpdate(
         { user: req.user.id },
@@ -80,6 +82,9 @@ const createOrUpdateProfile = async (req, res) => {
 
       return res.json(profile);
     }
+    //  else {
+    //   throw new Error("profile not found!, continue to create a new one");
+    // }
 
     // create
     profile = new Profile(profileFields);
@@ -112,14 +117,16 @@ const getUserProfile = async (req, res) => {
     }).populate("user", ["name", "avatar"]);
 
     if (!userProfile) {
-      return new HttpError("Profile not found!", 404);
+      res.json("Profile not found!");
+      throw new Error("Profile not found!");
     }
     res.json(userProfile);
   } catch (err) {
     if (err.kind == "ObjectId") {
+      console.log("getUserProfile -> ObjectId");
       return new HttpError("Profile not found!", 404);
     }
-    console.log(err.message);
+    console.error(err.message);
     return new HttpError("Server error!", 500);
   }
 };

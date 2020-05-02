@@ -36,7 +36,7 @@ router.get("/", getAllProfiles);
 
 // @route   POST api/profile/user/:userId
 // @access  Private
-router.get("/user/:userId", getUserProfile);
+router.get("/:userId", getUserProfile);
 
 // @route   DELETE api/profile, user, post
 // @access  Private
