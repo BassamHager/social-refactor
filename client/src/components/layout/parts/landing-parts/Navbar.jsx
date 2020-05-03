@@ -1,8 +1,10 @@
 import React, { useContext, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../context/auth-context";
-import Alert from "../layout/Alert";
-import { AlertContext } from "../context/alert-context";
+// context
+import { AuthContext } from "../../../customized/context/auth-context";
+import { AlertContext } from "../../../customized/context/alert-context";
+// parts
+import Alert from "../auth-parts/Alert";
 
 const Navbar = () => {
   const { setAlert } = useContext(AlertContext);

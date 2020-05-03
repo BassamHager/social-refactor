@@ -1,8 +1,10 @@
 import { useReducer, useCallback, useContext } from "react";
-import { useHttpClient } from "../../customized/hooks/Http-hook";
 import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
-import { AuthContext } from "../../context/auth-context";
-import { ProfileContext } from "../../context/profile-context";
+// hooks
+import { useHttpClient } from "../../customized/hooks/Http-hook";
+// context
+import { AuthContext } from "../context/auth-context";
+import { ProfileContext } from "../context/profile-context";
 
 // Reducer
 const profileReducer = (state, action) => {
@@ -23,6 +25,7 @@ const profileReducer = (state, action) => {
   }
 };
 
+// hook
 export const useProfile = () => {
   const { sendRequest } = useHttpClient();
   const { userId } = useContext(AuthContext);

@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/auth-context";
+// context
+import { AuthContext } from "../../customized/context/auth-context";
 
 const Landing = () => {
   const { setIsToLoginMode } = useContext(AuthContext);

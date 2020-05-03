@@ -1,16 +1,19 @@
 import React, { Fragment, useContext } from "react";
+import { useHistory } from "react-router-dom";
+// formElement
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
+// hooks
+import { useForm } from "../../customized/hooks/Form-hook";
+import { useHttpClient } from "../../customized/hooks/Http-hook";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
-} from "../../util/Validators";
-import { AlertContext } from "../../context/alert-context";
-import { useForm } from "../../customized/hooks/Form-hook";
-import { useHttpClient } from "../../customized/hooks/Http-hook";
-import { AuthContext } from "../../context/auth-context";
-import { useHistory } from "react-router-dom";
+} from "../../customized/hooks/Validators-hook";
+// context
+import { AlertContext } from "../../customized/context/alert-context";
+import { AuthContext } from "../../customized/context/auth-context";
 
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);

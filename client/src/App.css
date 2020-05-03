@@ -502,7 +502,7 @@ button {
 }
 
 .green {
-  background: green;
+  background: var(--primary-color);
 }
 
 /* Mobile Styles */

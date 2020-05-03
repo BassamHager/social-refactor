@@ -1,7 +1,9 @@
 import React, { useEffect, useContext, Fragment } from "react";
-import { useProfile } from "../../customized/hooks/Profile-hook";
-import { ProfileContext } from "../../context/profile-context";
 import Button from "../../customized/formElement/Button";
+// hooks
+import { useProfile } from "../../customized/hooks/Profile-hook";
+// context
+import { ProfileContext } from "../../customized/context/profile-context";
 
 const Dashboard = () => {
   const { getCurrentProfile } = useProfile();
