@@ -71,8 +71,8 @@ const createOrUpdateProfile = async (req, res) => {
 
   try {
     let profile = await Profile.findOne({ user: req.userId });
+
     if (profile) {
-      console.log("123: createOrUpdateProfile -> profile", profile);
       //update
       profile = await Profile.findOneAndUpdate(
         { user: req.user.id },
@@ -82,9 +82,6 @@ const createOrUpdateProfile = async (req, res) => {
 
       return res.json(profile);
     }
-    //  else {
-    //   throw new Error("profile not found!, continue to create a new one");
-    // }
 
     // create
     profile = new Profile(profileFields);
@@ -116,10 +113,6 @@ const getUserProfile = async (req, res) => {
       user: req.params.userId,
     }).populate("user", ["name", "avatar"]);
 
-    if (!userProfile) {
-      res.json("Profile not found!");
-      throw new Error("Profile not found!");
-    }
     res.json(userProfile);
   } catch (err) {
     if (err.kind == "ObjectId") {
