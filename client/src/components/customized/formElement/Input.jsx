@@ -38,6 +38,7 @@ const Input = (props) => {
   }, [id, value, isValid, onInput]);
 
   const changeHandler = (e) => {
+    console.log(e.target.value);
     dispatch({
       type: "CHANGE",
       val: e.target.value,
@@ -60,7 +61,6 @@ const Input = (props) => {
         onChange={changeHandler}
         onBlur={touchHandler}
         value={value}
-        required
       />
     ) : (
       <textarea
@@ -68,6 +68,7 @@ const Input = (props) => {
         rows={props.rows || 3}
         onChange={changeHandler}
         onBlur={touchHandler}
+        placeholder={props.placeholder}
         value={value}
       />
     );

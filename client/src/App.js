@@ -6,6 +6,7 @@ import Landing from "./components/layout/pages/Landing";
 import Profile from "./components/layout/pages/Profile";
 import Dashboard from "./components/layout/pages/Dashboard";
 import Auth from "./components/layout/pages/Auth";
+import CreateProfile from "./components/layout/pages/CreateProfile";
 // parts
 import Navbar from "./components/layout/parts/landing-parts/Navbar";
 // customized
@@ -50,6 +51,7 @@ const App = () => {
                 <Route exact path="/auth" component={Auth} />
                 <Route exact path="/dashboard" component={Dashboard} />
                 <Route exact path="/profile" component={Profile} />
+                <Route exact path="/create-profile" component={CreateProfile} />
                 {/* <Redirect to="auth" /> */}
               </Switch>
             </section>
