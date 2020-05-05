@@ -38,7 +38,6 @@ const Input = (props) => {
   }, [id, value, isValid, onInput]);
 
   const changeHandler = (e) => {
-    console.log(e.target.value);
     dispatch({
       type: "CHANGE",
       val: e.target.value,

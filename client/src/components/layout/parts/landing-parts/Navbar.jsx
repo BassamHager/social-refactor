@@ -16,8 +16,8 @@ const Navbar = () => {
       setAlert("danger", "You have logged out!");
     } else {
       login();
+      setIsToLoginMode(true);
     }
-    setIsToLoginMode(true);
   };
 
   return (

@@ -23,6 +23,7 @@ const Landing = () => {
             >
               Sign Up
             </Link>
+
             <Link
               to="/auth"
               onClick={() => setIsToLoginMode(true)}

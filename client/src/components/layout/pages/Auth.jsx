@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 // formElement
 import Input from "../../customized/formElement/Input";
@@ -42,38 +42,27 @@ const Auth = () => {
     false
   );
 
-  // add password2
   const { name, email, password } = formState.inputs;
 
-  //  SWITCH LOGGING MODE
-  const switchModeHandler = () => {
-    if (!isToLoginMode) {
-      //if it's still in registration mode
-      setFormData(
-        {
-          ...formState.inputs,
-          name: undefined,
-          password2: undefined,
-        },
-        email.isValid && password.isValid
-      );
-    } else {
-      setFormData(
-        {
-          ...formState.inputs,
-          name: {
-            value: "",
-            isValid: false,
+  const signInOrUp = () => {
+    isToLoginMode
+      ? setFormData(
+          {
+            ...formState.inputs,
+            name: undefined,
           },
-          password2: {
-            value: "",
-            isValid: false,
+          email.isValid && password.isValid
+        )
+      : setFormData(
+          {
+            ...formState.inputs,
+            name: {
+              value: "",
+              isValid: false,
+            },
           },
-        },
-        false
-      );
-    }
-    setIsToLoginMode((isToLoginMode) => !isToLoginMode);
+          false
+        );
   };
 
   // SUBMIT FORM
@@ -123,6 +112,10 @@ const Auth = () => {
       }
     }
   };
+
+  useEffect(() => {
+    signInOrUp();
+  }, [isToLoginMode]);
 
   return (
     <Fragment>
@@ -195,7 +188,11 @@ const Auth = () => {
         </Button>
       </form>
       <br />
-      <Button className="my-1" inverse onClick={switchModeHandler}>
+      <Button
+        className="my-1"
+        inverse
+        onClick={() => setIsToLoginMode(!isToLoginMode)}
+      >
         SWITCH TO {isToLoginMode ? "SIGN UP" : "LOGIN"}
       </Button>
     </Fragment>
