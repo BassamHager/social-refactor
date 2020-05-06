@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect } from "react";
+import React, { Fragment, useContext, useEffect, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 // formElement
 import Input from "../../customized/formElement/Input";
@@ -44,7 +44,7 @@ const Auth = () => {
 
   const { name, email, password } = formState.inputs;
 
-  const signInOrUp = () => {
+  const signInOrUp = useCallback(() => {
     isToLoginMode
       ? setFormData(
           {
@@ -63,7 +63,13 @@ const Auth = () => {
           },
           false
         );
-  };
+  }, [
+    email.isValid,
+    formState.inputs,
+    isToLoginMode,
+    password.isValid,
+    setFormData,
+  ]);
 
   // SUBMIT FORM
   const authSubmitHandler = async (event) => {
