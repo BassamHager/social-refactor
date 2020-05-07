@@ -18,7 +18,7 @@ import { AuthContext } from "./components/customized/context/auth-context";
 import { ProfileContext } from "./components/customized/context/profile-context";
 
 const App = () => {
-  const { token, login, logout, userId } = useAuth();
+  const { token, setToken, login, logout, userId } = useAuth();
   const [alerts, setAlert] = useAlert();
   const [isToLoginMode, setIsToLoginMode] = useState(true);
   const [profile, setProfile] = useState({});
@@ -35,6 +35,7 @@ const App = () => {
           value={{
             isLoggedIn: !!token,
             token,
+            setToken,
             userId,
             login,
             logout,

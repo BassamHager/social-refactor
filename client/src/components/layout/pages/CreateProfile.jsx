@@ -1,85 +1,39 @@
 import React, { Fragment, useState } from "react";
+import { withRouter } from "react-router-dom";
 // hooks
 import { useForm } from "../../customized/hooks/Form-hook";
+import { useProfile } from "../../customized/hooks/Profile-hook";
 import { VALIDATOR_REQUIRE } from "../../customized/hooks/Validators-hook";
 // formElements
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
 
 const CreateProfile = () => {
+  const { createOrUpdateProfile } = useProfile();
+
   const [formState, inputHandler] = useForm(
     {
-      company: {
-        value: "",
-        // isValid: true,
-      },
-      website: {
-        value: "",
-        // isValid: true,
-      },
-      location: {
-        value: "",
-        isValid: true,
-      },
-      status: {
-        value: "",
-        // isValid: true,
-      },
-      skills: {
-        value: "",
-        isValid: false,
-      },
-      githubusername: {
-        value: "",
-        // isValid: true,
-      },
-      bio: {
-        value: "",
-        // isValid: true,
-      },
-      twitter: {
-        value: "",
-        // isValid: true,
-      },
-      facebook: {
-        value: "",
-        // isValid: true,
-      },
-      linkedin: {
-        value: "",
-        // isValid: true,
-      },
-      youtube: {
-        value: "",
-        // isValid: true,
-      },
-      instagram: {
-        value: "",
-        // isValid: true,
-      },
+      company: {},
+      website: {},
+      location: {},
+      status: {},
+      skills: {},
+      githubusername: {},
+      bio: {},
+      twitter: {},
+      facebook: {},
+      linkedin: {},
+      youtube: {},
+      instagram: {},
     },
     false
   );
   const [displaySocials, toggleDisplaySocials] = useState(false);
 
-  // const {
-  //   company,
-  //   website,
-  //   location,
-  //   status,
-  //   skills,
-  //   githubusername,
-  //   bio,
-  //   twitter,
-  //   facebook,
-  //   linkedin,
-  //   youtube,
-  //   instagram,
-  // } = formState.inputs;
-
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState);
+    // console.log(formState);
+    createOrUpdateProfile(formState);
   };
 
   return (
@@ -159,7 +113,7 @@ const CreateProfile = () => {
             id="skills"
             type="text"
             label="* Skills"
-            // validators={[VALIDATOR_REQUIRE()]}
+            validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter at least one skill! (separated by comas,,,)"
             placeholder="first skill, second skill, third..."
             onInput={inputHandler}
@@ -275,7 +229,7 @@ const CreateProfile = () => {
         )}
         <Button>Submit</Button>
 
-        <Button className="btn btn-light my-1" href="dashboard.html">
+        <Button className="btn btn-light my-1" to="/dashboard">
           Go Back
         </Button>
       </form>
@@ -283,4 +237,19 @@ const CreateProfile = () => {
   );
 };
 
-export default CreateProfile;
+export default withRouter(CreateProfile);
+
+// const {
+//   company,
+//   website,
+//   location,
+//   status,
+//   skills,
+//   githubusername,
+//   bio,
+//   twitter,
+//   facebook,
+//   linkedin,
+//   youtube,
+//   instagram,
+// } = formState.inputs;

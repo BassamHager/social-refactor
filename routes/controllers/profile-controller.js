@@ -25,7 +25,7 @@ const getMyProfile = async (req, res) => {
 };
 
 // 2- Create or update a user profile
-const createOrUpdateProfile = async (req, res) => {
+const createOrUpdateProfile = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(

@@ -7,17 +7,14 @@ import { ProfileContext } from "../../customized/context/profile-context";
 
 const Dashboard = () => {
   const { getCurrentProfile } = useProfile();
-  const profileContext = useContext(ProfileContext);
+  const { profile } = useContext(ProfileContext);
 
-  let profile, user;
+  let user;
 
-  if (profileContext) {
-    profile = profileContext.profile;
-
-    if (profile) {
-      user = profile.user;
-    }
+  if (profile) {
+    user = profile.user;
   }
+  // }
 
   useEffect(() => {
     getCurrentProfile();
@@ -25,30 +22,25 @@ const Dashboard = () => {
 
   return (
     <Fragment>
-      {profile && profile !== undefined ? (
+      <h1>Spinner...</h1>
+      <Fragment>
+        <h1 className="large text-primary">Dashboard</h1>
+        <p className="lead">
+          <i className="fas fa-user"></i> Welcome {user && user.name}
+        </p>
+      </Fragment>
+      <hr />
+
+      {!profile && profile !== undefined ? (
         <Fragment>
-          <h1 className="large text-primary">Dashboard</h1>
-          <p className="lead">
-            <i className="fas fa-user"></i> Welcome {user && user.name}
-          </p>
-        </Fragment>
-      ) : (
-        <Fragment>
-          <p>Spinner...</p>
-        </Fragment>
-      )}
-      {!profile && profile !== undefined && (
-        <Fragment>
-          <hr />
-          <h1>don't show this or below</h1>
-          <h2>!loading</h2>
-          <p>
-            Your profile is empty, for a better presentation, please set up your
-            info
-          </p>
+          <p>You have no profile yet!</p>
           <Button to="/create-profile" className="btn btn-primary my-1">
             Create Profile
           </Button>
+        </Fragment>
+      ) : (
+        <Fragment>
+          <p>my Profile</p>
         </Fragment>
       )}
     </Fragment>

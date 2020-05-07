@@ -18,26 +18,20 @@ import { AuthContext } from "../../customized/context/auth-context";
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);
   const { sendRequest } = useHttpClient();
-  const { login, isToLoginMode, setIsToLoginMode } = useContext(AuthContext);
+  const {
+    login,
+    isToLoginMode,
+    setIsToLoginMode,
+    token,
+    setToken,
+  } = useContext(AuthContext);
   const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
-      name: {
-        value: "",
-        isValid: false,
-      },
-      email: {
-        value: "",
-        isValid: false,
-      },
-      password: {
-        value: "",
-        isValid: false,
-      },
-      // password2: {
-      //   value: "",
-      //   isValid: false,
-      // },
+      name: {},
+      email: {},
+      password: {},
+      // password2: {},
     },
     false
   );
@@ -56,18 +50,15 @@ const Auth = () => {
       : setFormData(
           {
             ...formState.inputs,
-            name: {
-              value: "",
-              isValid: false,
-            },
+            name: {},
           },
           false
         );
   }, [
     email.isValid,
     formState.inputs,
-    isToLoginMode,
     password.isValid,
+    isToLoginMode,
     setFormData,
   ]);
 
@@ -88,10 +79,13 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        login(resData.userId, resData.token);
+        setToken(resData.token);
+        login(resData.userId, token);
+
         setAlert("success", "You have logged in successfully!");
         history.push("/dashboard");
       } catch (err) {
+        console.log(err.message);
         setAlert("danger", err.message);
       }
     } else {
@@ -121,6 +115,7 @@ const Auth = () => {
 
   useEffect(() => {
     signInOrUp();
+    // eslint-disable-next-line
   }, [isToLoginMode]);
 
   return (

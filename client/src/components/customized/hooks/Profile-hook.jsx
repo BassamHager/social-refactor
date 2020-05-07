@@ -28,17 +28,18 @@ const profileReducer = (state, action) => {
 // hook
 export const useProfile = () => {
   const { sendRequest } = useHttpClient();
-  const { userId } = useContext(AuthContext);
+  const { userId, token } = useContext(AuthContext);
   const { setProfile } = useContext(ProfileContext);
   //   console.log("123: useProfile -> userId", userId);
 
-  const [profiles, dispatch] = useReducer(profileReducer, {
+  const [, dispatch] = useReducer(profileReducer, {
     profile: null,
     profiles: [],
     repos: [],
     error: {},
   });
 
+  // GET PROFILE
   const getCurrentProfile = useCallback(async () => {
     try {
       const resProfile = await sendRequest(`/api/profile/${userId}`);
@@ -56,6 +57,30 @@ export const useProfile = () => {
     }
   }, [sendRequest, userId, setProfile]);
 
-  if (profiles & dispatch) console.log("remove me");
-  return { getCurrentProfile };
+  // CREATE OR UPDATE PROFILE
+  const createOrUpdateProfile = useCallback(
+    async (formData, history, edit = false) => {
+      console.log(token);
+      try {
+        const newProfile = await sendRequest(
+          `http://localhost:5000/api/profile`,
+          "POST",
+          formData,
+          {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          }
+        );
+
+        console.log(newProfile);
+        console.log(formData);
+        // setProfile(newProfile);
+      } catch (err) {
+        console.log(err.message);
+      }
+    },
+    [sendRequest, token]
+  );
+
+  return { getCurrentProfile, createOrUpdateProfile };
 };

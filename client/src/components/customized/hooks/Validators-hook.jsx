@@ -53,6 +53,5 @@ export const validate = (value, validators) => {
     //   isValid = isValid && value === validator.val;
     // }
   }
-  console.log(isValid);
   return isValid;
 };
