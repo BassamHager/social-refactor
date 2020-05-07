@@ -10,6 +10,7 @@ import Button from "../../customized/formElement/Button";
 
 const CreateProfile = () => {
   const { createOrUpdateProfile } = useProfile();
+  const [displaySocials, toggleDisplaySocials] = useState(false);
 
   const [formState, inputHandler] = useForm(
     {
@@ -28,11 +29,9 @@ const CreateProfile = () => {
     },
     false
   );
-  const [displaySocials, toggleDisplaySocials] = useState(false);
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    // console.log(formState);
     createOrUpdateProfile(formState);
   };
 
@@ -46,7 +45,7 @@ const CreateProfile = () => {
       <small>* = required field</small>
       <form className="form" onSubmit={authSubmitHandler}>
         <div className="form-group">
-          <select name="status">
+          <select defaultValue="Developer" name="status">
             <option value="0">* Select Professional Status</option>
             <option value="Developer">Developer</option>
             <option value="Junior Developer">Junior Developer</option>

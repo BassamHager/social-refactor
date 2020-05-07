@@ -18,13 +18,7 @@ import { AuthContext } from "../../customized/context/auth-context";
 const Auth = () => {
   const { setAlert } = useContext(AlertContext);
   const { sendRequest } = useHttpClient();
-  const {
-    login,
-    isToLoginMode,
-    setIsToLoginMode,
-    token,
-    setToken,
-  } = useContext(AuthContext);
+  const { login, isToLoginMode, setIsToLoginMode } = useContext(AuthContext);
   const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -38,7 +32,7 @@ const Auth = () => {
 
   const { name, email, password } = formState.inputs;
 
-  const signInOrUp = useCallback(() => {
+  const signInOrUpFrom = useCallback(() => {
     isToLoginMode
       ? setFormData(
           {
@@ -79,8 +73,7 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        setToken(resData.token);
-        login(resData.userId, token);
+        login(resData.userId, resData.token);
 
         setAlert("success", "You have logged in successfully!");
         history.push("/dashboard");
@@ -114,8 +107,8 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    signInOrUp();
-    // eslint-disable-next-line
+    signInOrUpFrom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isToLoginMode]);
 
   return (

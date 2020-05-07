@@ -33,7 +33,6 @@ const App = () => {
       >
         <AuthContext.Provider
           value={{
-            isLoggedIn: !!token,
             token,
             setToken,
             userId,

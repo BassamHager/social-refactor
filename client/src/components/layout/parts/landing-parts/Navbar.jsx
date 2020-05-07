@@ -24,7 +24,7 @@ const Navbar = () => {
     <Fragment>
       <nav className="navbar bg-dark">
         <h1>
-          <Link to="/">Social_Dev_Connector</Link>
+          <Link to={token ? "/developers" : "/"}>Social_Dev_Connector</Link>
         </h1>
         <ul>
           {token && (

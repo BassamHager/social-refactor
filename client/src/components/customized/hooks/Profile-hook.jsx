@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useContext } from "react";
+import { useReducer, useCallback, useContext, useState } from "react";
 import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
 // hooks
 import { useHttpClient } from "../../customized/hooks/Http-hook";
@@ -29,7 +29,7 @@ const profileReducer = (state, action) => {
 export const useProfile = () => {
   const { sendRequest } = useHttpClient();
   const { userId, token } = useContext(AuthContext);
-  const { setProfile } = useContext(ProfileContext);
+  const { setProfile, profile } = useContext(ProfileContext);
   //   console.log("123: useProfile -> userId", userId);
 
   const [, dispatch] = useReducer(profileReducer, {
@@ -45,7 +45,6 @@ export const useProfile = () => {
       const resProfile = await sendRequest(`/api/profile/${userId}`);
 
       setProfile(resProfile);
-      // console.log("123: getCurrentProfile -> resProfile", resProfile);
 
       dispatch({ type: GET_PROFILE, payload: resProfile });
     } catch (err) {
@@ -60,26 +59,24 @@ export const useProfile = () => {
   // CREATE OR UPDATE PROFILE
   const createOrUpdateProfile = useCallback(
     async (formData, history, edit = false) => {
-      console.log(token);
       try {
         const newProfile = await sendRequest(
-          `http://localhost:5000/api/profile`,
+          `/api/profile`,
           "POST",
-          formData,
+          JSON.stringify(formData),
           {
-            "Content-Type": "application/json",
             "x-auth-token": token,
           }
         );
-
-        console.log(newProfile);
-        console.log(formData);
+        // console.log(newProfile);
         // setProfile(newProfile);
+        setProfile(newProfile);
+        console.log(profile);
       } catch (err) {
         console.log(err.message);
       }
     },
-    [sendRequest, token]
+    [sendRequest, token, profile]
   );
 
   return { getCurrentProfile, createOrUpdateProfile };

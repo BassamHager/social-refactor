@@ -28,6 +28,7 @@ const getMyProfile = async (req, res) => {
 const createOrUpdateProfile = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log(errors.array());
     return next(
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
@@ -75,7 +76,7 @@ const createOrUpdateProfile = async (req, res, next) => {
     if (profile) {
       //update
       profile = await Profile.findOneAndUpdate(
-        { user: req.user.id },
+        { user: req.userId },
         { $set: profileFields },
         { new: true }
       );
