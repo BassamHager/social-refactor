@@ -8,7 +8,7 @@ import { VALIDATOR_REQUIRE } from "../../customized/hooks/Validators-hook";
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
 
-const CreateProfile = () => {
+const CreateProfile = ({ history }) => {
   const { createOrUpdateProfile } = useProfile();
   const [displaySocials, toggleDisplaySocials] = useState(false);
 
@@ -30,25 +30,9 @@ const CreateProfile = () => {
     false
   );
 
-  // const {
-  //   company,
-  //   website,
-  //   location,
-  //   status,
-  //   skills,
-  //   githubusername,
-  //   bio,
-  //   twitter,
-  //   facebook,
-  //   linkedin,
-  //   youtube,
-  //   instagram,
-  // } = formState.inputs;
-
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    // console.log(formState);
-    createOrUpdateProfile(formState.inputs);
+    createOrUpdateProfile(formState.inputs, history);
   };
 
   return (

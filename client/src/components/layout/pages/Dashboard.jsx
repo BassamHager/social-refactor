@@ -40,7 +40,8 @@ const Dashboard = () => {
         </Fragment>
       ) : (
         <Fragment>
-          <p>my Profile</p>
+          <p>{user && user.name} Profile</p>
+          <Button to="create-profile">Edit Profile</Button>
         </Fragment>
       )}
     </Fragment>

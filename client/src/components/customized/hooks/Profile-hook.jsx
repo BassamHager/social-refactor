@@ -1,42 +1,45 @@
 import { useReducer, useCallback, useContext } from "react";
-import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
+// import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
+import { SET_ALERT } from "../../customized/Types";
 // hooks
 import { useHttpClient } from "../../customized/hooks/Http-hook";
 // context
 import { AuthContext } from "../context/auth-context";
 import { ProfileContext } from "../context/profile-context";
+import { AlertContext } from "../context/alert-context";
 
 // Reducer
-const profileReducer = (state, action) => {
-  const { type, payload } = action;
-  switch (type) {
-    case GET_PROFILE:
-      return {
-        ...state,
-        profile: payload,
-      };
-    case PROFILE_ERROR:
-      return {
-        ...state,
-        error: payload,
-      };
-    default:
-      return state;
-  }
-};
+// const profileReducer = (state, action) => {
+//   const { type, payload } = action;
+//   switch (type) {
+//     case GET_PROFILE:
+//       return {
+//         ...state,
+//         profile: payload,
+//       };
+//     case PROFILE_ERROR:
+//       return {
+//         ...state,
+//         error: payload,
+//       };
+//     default:
+//       return state;
+//   }
+// };
 
 // hook
 export const useProfile = () => {
+  const { setAlert } = useContext(AlertContext);
   const { sendRequest } = useHttpClient();
   const { userId, token } = useContext(AuthContext);
   const { setProfile } = useContext(ProfileContext);
 
-  const [, dispatch] = useReducer(profileReducer, {
-    profile: {},
-    profiles: [],
-    repos: [],
-    error: {},
-  });
+  // const [, dispatch] = useReducer(profileReducer, {
+  //   profile: {},
+  //   profiles: [],
+  //   repos: [],
+  //   error: {},
+  // });
 
   // GET PROFILE
   const getCurrentProfile = useCallback(async () => {
@@ -45,13 +48,13 @@ export const useProfile = () => {
 
       setProfile(resProfile);
 
-      dispatch({ type: GET_PROFILE, payload: resProfile });
+      // dispatch({ type: GET_PROFILE, payload: resProfile });
     } catch (err) {
       console.log(err);
-      dispatch({
-        type: PROFILE_ERROR,
-        payload: { msg: err.msg },
-      });
+      // dispatch({
+      //   type: PROFILE_ERROR,
+      //   payload: { msg: err.msg },
+      // });
     }
   }, [sendRequest, userId, setProfile]);
 
@@ -68,11 +71,13 @@ export const useProfile = () => {
             "x-auth-token": token,
           }
         );
+        setAlert("success", edit ? "profile created!" : "profile updated!");
 
         setProfile(newProfile);
       } catch (err) {
         console.log(err.message);
       }
+      history.push("/dashboard");
     },
     [sendRequest, token, setProfile]
   );

@@ -37,7 +37,7 @@ const Input = (props) => {
     dispatch({
       type: "CHANGE",
       val: e.target.value,
-      validators: props.validators,
+      validators: props.validators || [],
     });
   };
 
