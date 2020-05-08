@@ -52,23 +52,23 @@ const createOrUpdateProfile = async (req, res, next) => {
   // build profile object
   const profileFields = {};
   profileFields.user = req.userId;
-  if (company) profileFields.company = company;
-  if (website) profileFields.website = website;
-  if (location) profileFields.location = location;
-  if (bio) profileFields.bio = bio;
-  if (status) profileFields.status = status;
-  if (githubusername) profileFields.githubusername = githubusername;
+  if (company) profileFields.company = company.value;
+  if (website) profileFields.website = website.value;
+  if (location) profileFields.location = location.value;
+  if (bio) profileFields.bio = bio.value;
+  if (status) profileFields.status = status.value;
+  if (githubusername) profileFields.githubusername = githubusername.value;
   if (skills) {
-    profileFields.skills = skills.split(",").map((skill) => skill.trim());
+    profileFields.skills = skills.value.split(",").map((skill) => skill.trim());
   }
 
   // build profile social object
   profileFields.social = {};
-  if (youtube) profileFields.social.youtube = youtube;
-  if (twitter) profileFields.social.twitter = twitter;
-  if (facebook) profileFields.social.facebook = facebook;
-  if (linkedin) profileFields.social.linkedin = linkedin;
-  if (instagram) profileFields.social.instagram = instagram;
+  if (youtube) profileFields.social.youtube = youtube.value;
+  if (twitter) profileFields.social.twitter = twitter.value;
+  if (facebook) profileFields.social.facebook = facebook.value;
+  if (linkedin) profileFields.social.linkedin = linkedin.value;
+  if (instagram) profileFields.social.instagram = instagram.value;
 
   try {
     let profile = await Profile.findOne({ user: req.userId });
@@ -88,6 +88,7 @@ const createOrUpdateProfile = async (req, res, next) => {
     profile = new Profile(profileFields);
 
     await profile.save();
+
     return res.json(profile);
   } catch (err) {
     console.log(err.message);

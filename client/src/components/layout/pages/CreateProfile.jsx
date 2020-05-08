@@ -30,9 +30,25 @@ const CreateProfile = () => {
     false
   );
 
+  // const {
+  //   company,
+  //   website,
+  //   location,
+  //   status,
+  //   skills,
+  //   githubusername,
+  //   bio,
+  //   twitter,
+  //   facebook,
+  //   linkedin,
+  //   youtube,
+  //   instagram,
+  // } = formState.inputs;
+
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-    createOrUpdateProfile(formState);
+    // console.log(formState);
+    createOrUpdateProfile(formState.inputs);
   };
 
   return (
@@ -237,18 +253,3 @@ const CreateProfile = () => {
 };
 
 export default withRouter(CreateProfile);
-
-// const {
-//   company,
-//   website,
-//   location,
-//   status,
-//   skills,
-//   githubusername,
-//   bio,
-//   twitter,
-//   facebook,
-//   linkedin,
-//   youtube,
-//   instagram,
-// } = formState.inputs;

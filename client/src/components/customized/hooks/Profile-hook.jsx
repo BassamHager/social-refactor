@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useContext, useState } from "react";
+import { useReducer, useCallback, useContext } from "react";
 import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
 // hooks
 import { useHttpClient } from "../../customized/hooks/Http-hook";
@@ -29,11 +29,10 @@ const profileReducer = (state, action) => {
 export const useProfile = () => {
   const { sendRequest } = useHttpClient();
   const { userId, token } = useContext(AuthContext);
-  const { setProfile, profile } = useContext(ProfileContext);
-  //   console.log("123: useProfile -> userId", userId);
+  const { setProfile } = useContext(ProfileContext);
 
   const [, dispatch] = useReducer(profileReducer, {
-    profile: null,
+    profile: {},
     profiles: [],
     repos: [],
     error: {},
@@ -65,19 +64,23 @@ export const useProfile = () => {
           "POST",
           JSON.stringify(formData),
           {
+            "Content-Type": "Application/json",
             "x-auth-token": token,
           }
         );
-        // console.log(newProfile);
-        // setProfile(newProfile);
+
         setProfile(newProfile);
-        console.log(profile);
       } catch (err) {
         console.log(err.message);
       }
     },
-    [sendRequest, token, profile]
+    [sendRequest, token, setProfile]
   );
+
+  // useEffect(() => {
+  //   console.log(profile);
+  //   // if (token) createOrUpdateProfile();
+  // }, [getCurrentProfile, createOrUpdateProfile]);
 
   return { getCurrentProfile, createOrUpdateProfile };
 };
