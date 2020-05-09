@@ -29,6 +29,19 @@ const Dashboard = () => {
           <i className="fas fa-user"></i> Welcome {user && user.name}
         </p>
       </Fragment>
+      <Fragment>
+        <div className="dash-buttons">
+          <Button to="create-profile" className="btn btn-light">
+            <i className="fas fa-user-circle text-primary"></i> Edit Profile
+          </Button>
+          <Button to="add-experience" className="btn btn-light">
+            <i className="fab fa-black-tie text-primary"></i> Add Experience
+          </Button>
+          <Button to="add-education" className="btn btn-light">
+            <i className="fas fa-graduation-cap text-primary"></i> Add Education
+          </Button>
+        </div>
+      </Fragment>
       <hr />
 
       {!profile && profile !== undefined ? (
@@ -41,7 +54,6 @@ const Dashboard = () => {
       ) : (
         <Fragment>
           <p>{user && user.name} Profile</p>
-          <Button to="create-profile">Edit Profile</Button>
         </Fragment>
       )}
     </Fragment>

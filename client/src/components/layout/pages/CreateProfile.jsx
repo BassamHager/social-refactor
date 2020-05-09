@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useContext, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 // hooks
 import { useForm } from "../../customized/hooks/Form-hook";
@@ -7,14 +7,31 @@ import { VALIDATOR_REQUIRE } from "../../customized/hooks/Validators-hook";
 // formElements
 import Input from "../../customized/formElement/Input";
 import Button from "../../customized/formElement/Button";
+// context
+import { ProfileContext } from "../../customized/context/profile-context";
 
 const CreateProfile = ({ history }) => {
   const { createOrUpdateProfile } = useProfile();
   const [displaySocials, toggleDisplaySocials] = useState(false);
+  // context
+  const { profile } = useContext(ProfileContext);
+  const {
+    company,
+    website,
+    location,
+    skills,
+    githubusername,
+    bio,
+    twitter,
+    facebook,
+    linkedin,
+    youtube,
+    instagram,
+  } = profile;
 
   const [formState, inputHandler] = useForm(
     {
-      company: {},
+      company: { value: company || "" },
       website: {},
       location: {},
       status: {},
@@ -34,6 +51,11 @@ const CreateProfile = ({ history }) => {
     event.preventDefault();
     createOrUpdateProfile(formState.inputs, history);
   };
+
+  useEffect(() => {
+    console.log(formState.inputs);
+    console.log(profile);
+  }, [profile, formState.inputs]);
 
   return (
     <Fragment>
@@ -70,6 +92,7 @@ const CreateProfile = ({ history }) => {
             placeholder="company name..."
             onInput={inputHandler}
             initialValid={true}
+            initialValue={company}
           />
           <small className="form-text">
             Could be your own company or one you work for
@@ -85,6 +108,7 @@ const CreateProfile = ({ history }) => {
             placeholder="website..."
             onInput={inputHandler}
             initialValid={true}
+            initialValue={website}
           />
           <small className="form-text">
             Could be your own or a company website
@@ -100,6 +124,7 @@ const CreateProfile = ({ history }) => {
             placeholder="location ..."
             onInput={inputHandler}
             initialValid={true}
+            initialValue={location}
           />
           <small className="form-text">
             City & state suggested (eg. Boston, MA)
@@ -116,6 +141,7 @@ const CreateProfile = ({ history }) => {
             errorText="Please enter at least one skill! (separated by comas,,,)"
             placeholder="first skill, second skill, third..."
             onInput={inputHandler}
+            initialValue={skills}
           />
           <small className="form-text">
             Please use comma separated values (eg. HTML,CSS,JavaScript,PHP)
@@ -131,6 +157,7 @@ const CreateProfile = ({ history }) => {
             placeholder="your name..."
             onInput={inputHandler}
             initialValid={true}
+            initialValue={githubusername}
           />
           <small className="form-text">
             If you want your latest repos and a Github link, include your
@@ -147,6 +174,7 @@ const CreateProfile = ({ history }) => {
             placeholder="your Bio..."
             onInput={inputHandler}
             initialValid={true}
+            initialValue={bio}
           />
           <small className="form-text">Tell us a little about yourself</small>
         </div>
@@ -170,6 +198,7 @@ const CreateProfile = ({ history }) => {
                 placeholder="your Twitter URL..."
                 onInput={inputHandler}
                 initialValid={true}
+                initialValue={twitter}
               />
             </div>
 
@@ -183,6 +212,7 @@ const CreateProfile = ({ history }) => {
                 placeholder="your Facebook URL..."
                 onInput={inputHandler}
                 initialValid={true}
+                initialValue={facebook}
               />
             </div>
 
@@ -196,6 +226,7 @@ const CreateProfile = ({ history }) => {
                 placeholder="your Youtube URL..."
                 onInput={inputHandler}
                 initialValid={true}
+                initialValue={youtube}
               />
             </div>
 
@@ -209,6 +240,7 @@ const CreateProfile = ({ history }) => {
                 placeholder="your Linkedin URL..."
                 onInput={inputHandler}
                 initialValid={true}
+                initialValue={linkedin}
               />
             </div>
 
@@ -222,6 +254,7 @@ const CreateProfile = ({ history }) => {
                 placeholder="your Instagram URL..."
                 onInput={inputHandler}
                 initialValid={true}
+                initialValue={instagram}
               />
             </div>
           </Fragment>

@@ -59,9 +59,10 @@ const createOrUpdateProfile = async (req, res, next) => {
   if (status) profileFields.status = status.value;
   if (githubusername) profileFields.githubusername = githubusername.value;
   if (skills) {
-    profileFields.skills = skills.value.split(",").map((skill) => skill.trim());
+    profileFields.skills = skills.split(",").map((skill) => skill.trim());
   }
 
+  console.log("profileFields", profileFields);
   // build profile social object
   profileFields.social = {};
   if (youtube) profileFields.social.youtube = youtube.value;
@@ -81,6 +82,7 @@ const createOrUpdateProfile = async (req, res, next) => {
         { new: true }
       );
 
+      console.log("profile", profile);
       return res.json(profile);
     }
 

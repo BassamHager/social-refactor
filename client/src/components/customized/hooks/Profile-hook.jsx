@@ -1,6 +1,5 @@
-import { useReducer, useCallback, useContext } from "react";
+import { useCallback, useContext } from "react";
 // import { PROFILE_ERROR, GET_PROFILE } from "../../customized/Types";
-import { SET_ALERT } from "../../customized/Types";
 // hooks
 import { useHttpClient } from "../../customized/hooks/Http-hook";
 // context
@@ -79,7 +78,7 @@ export const useProfile = () => {
       }
       history.push("/dashboard");
     },
-    [sendRequest, token, setProfile]
+    [sendRequest, token, setProfile, setAlert]
   );
 
   // useEffect(() => {
